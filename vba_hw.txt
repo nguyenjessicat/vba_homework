@@ -1,0 +1,86 @@
+Sub Stock2()
+
+'Create a script that will loop through all the stocks for one year and output the following information.
+  'The ticker symbol.
+  'Yearly change from opening price at the beginning of a given year to the closing price at the end of that year.
+  'The percent change from opening price at the beginning of a given year to the closing price at the end of that year.
+  'The total stock volume of the stock.
+'You should also have conditional formatting that will highlight positive change in green and negative change in red.
+
+    
+'Declare worksheet variable
+ Dim ws As Worksheet
+ 
+ 'for each loop
+ For Each ws In Worksheets
+Dim openStock As Double
+Dim closeStock As Double
+Dim Ticker As String
+Dim OutputRow As String
+OutputRow = 2
+Dim lastRow As Long
+
+
+'determine last row
+lastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+'set the beginning point for ticker and openstock
+Ticker = ws.Cells(2, 1).Value
+openStock = ws.Cells(2, 3).Value
+volume = 0
+
+'for loop
+For i = 2 To lastRow
+    If (Ticker = ws.Cells(i, 1).Value) Then
+    'and the volume is cumulative for all the same ticker
+        volume = volume + ws.Cells(i, 7).Value
+    End If
+    
+    'If ticker value is not the same as the first cell value then
+    If (Ticker <> ws.Cells(i, 1).Value) Then
+    
+        'populate the total volume
+        ws.Cells(OutputRow, 11).Value = volume
+    
+        
+        'the close stock value is in column 6 for that row
+        closeStock = ws.Cells(i, 6).Value
+        
+        'put in output cell the value of openstock minus closestock and the name of the ticker in the other output cell
+        ws.Cells(OutputRow, 10).Value = openStock - closeStock
+        ws.Cells(OutputRow, 9).Value = Ticker
+        
+    'calculate percent change from the openstock to the closestock
+        If (openStock <> 0) And (closeStock <> 0) Then
+        ws.Cells(OutputRow, 12).Value = ws.Cells(OutputRow, 10).Value / openStock
+        End If
+        ws.Cells(OutputRow, 12).NumberFormat = "00.0%"
+    
+        'reset the ticker to the current cell, openstock to same row, volume in same row, and the output row is the next row
+        Ticker = ws.Cells(i, 1).Value
+        openStock = ws.Cells(i, 3).Value
+        volume = ws.Cells(i, 7).Value
+        OutputRow = OutputRow + 1
+    End If
+
+    If ws.Cells(i, 12).Value > 0 Then
+        ws.Cells(i, 12).Interior.ColorIndex = 4
+    ElseIf ws.Cells(i, 12).Value < 0 Then
+        ws.Cells(i, 12).Interior.ColorIndex = 3
+    Else
+        ws.Cells(i, 12).Interior.ColorIndex = 0
+    
+
+    End If
+    
+
+Next i
+Next ws
+
+    
+    
+
+
+
+
+End Sub
